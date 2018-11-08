@@ -41,6 +41,12 @@ class _MyHomePageState extends State<MyHomePage> {
     super.dispose();
   }
 
+  // key form the form to help validation
+  final formKey = new GlobalKey<FormState>();
+
+  // loading bool to show the progress loading animation
+  bool _isLoading = false;
+
   // variables for form values
   String _name;
   String _tel_number;
@@ -71,8 +77,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   int year = DateTime.now().year + 1;
 
-  // key form the form to help validation
-  final formKey = new GlobalKey<FormState>();
+  
 
   //varible to keep the position of the inviter
   String _inviter_position = "Brother";
@@ -113,11 +118,22 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() => _member = value);
   }
 
+  // map for the vessels
+  Map<String, bool> _vessel = {
+    'Choir': false,
+    'Ushering': false,
+    'Technical': false,
+    'MPV': false,
+    'Library': false,
+    'Venue Decorators': false
+  };
+
+
   // function to set the student status of first timer
   void _setStudentStatus(String value){
-    if (value == "Yes"){
+    if (value == "1"){
       _studentRadioChanged(true, "student");
-    } else if (value == "No") {
+    } else if (value == "0") {
       _studentRadioChanged(true, "non_student");
     }
     setState(() => _student = value);
@@ -144,9 +160,10 @@ class _MyHomePageState extends State<MyHomePage> {
     final formState = formKey.currentState;
 
     if(formState.validate()){
+      setState(() => _isLoading = true);
       formState.save();
 
-      // _performLogin();
+      _performPost();
     }
   }
 
@@ -154,6 +171,79 @@ class _MyHomePageState extends State<MyHomePage> {
     final formState = formKey.currentState;
 
     formState.reset();
+  }
+
+  void _performPost(){
+    Dio dio = new Dio();
+
+    var body = {
+      "name" : _name,
+      "tel_number" : _tel_number,
+      "email" : _email,
+      "dob" : _valueDOB,
+      "attendance_date" : _valueDOA,
+      "occupation" : _occupation,
+      "work_place" : _place_of_work,
+      "inviter" : _inviter_name,
+      "member" : _member,
+      "student" : _student,
+      "school" : _school,
+      "programme" : _programme,
+      "hall_hostel" : _hall_hostel,
+      "room_no" : _room_number,
+      "area" : _area,
+      "residence" : _residence,
+      "house_no" : _house_num,
+      "landmark" : _landmark,
+      "choir" : _vessel['choir'].toString(),
+      "ushering" : _vessel['ushering'].toString(),
+      "technical" : _vessel['technical'].toString(),
+      "mpv" : _vessel['mpv'].toString(),
+      "library" : _vessel['library'].toString(),
+      "venue_decorators" : _vessel['venue_decorators'].toString()
+    };
+
+    FormData formData = new FormData.from(body);
+
+    dio.post(
+      "https://ccndirectory.herokuapp.com/first_timers/",
+      data: formData,
+      options: Options(
+        method: 'POST',
+        responseType: ResponseType.JSON
+      )
+      )
+      .then((response) {
+        print(response.data);
+        // print(responseMap);
+        _showDialog(response.data);
+        setState(() => _isLoading = false);
+        })
+      .catchError((error) => print(error));
+  }
+
+  // function to show the response of the post in an alert dialog
+  void _showDialog(var data) {
+    // flutter defined function
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        // return object of type Dialog
+        return AlertDialog(
+          title: new Text("Status"),
+          content: new Text(data['message'].toString()),
+          actions: <Widget>[
+            // usually buttons at the bottom of the dialog
+            new FlatButton(
+              child: new Text("OK"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -353,7 +443,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                         )
                                       ),
                                     validator: (val) => val.trim().length < 3 ? 'Invalid Name' : null,
-                                    onSaved: (val) => _inviter_name = val.trim(),
+                                    onSaved: (val) => _inviter_name = _inviter_position + " " + val.trim(),
                                   ), 
                             )
                           ],
@@ -379,7 +469,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           children: <Widget>[
                             new Flexible(
                               child: new RadioListTile(
-                                value: "Yes",
+                                value: "1",
                                 title: new Text("Yes"),
                                 groupValue: _member,
                                 onChanged: (String value){
@@ -390,7 +480,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
                             new Flexible(
                               child: new RadioListTile(
-                                value: "No",
+                                value: "0",
                                 title: new Text("No"),
                                 groupValue: _member,
                                 onChanged: (String value){
@@ -422,7 +512,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           children: <Widget>[
                             new Flexible(
                               child: new RadioListTile(
-                                value: "Yes",
+                                value: "1",
                                 title: new Text("Yes"),
                                 groupValue: _student,
                                 onChanged: (String value){
@@ -433,7 +523,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
                             new Flexible(
                               child: new RadioListTile(
-                                value: "No",
+                                value: "0",
                                 title: new Text("No"),
                                 groupValue: _student,
                                 onChanged: (String value){
@@ -603,7 +693,34 @@ class _MyHomePageState extends State<MyHomePage> {
 
                     new Padding(padding: const EdgeInsets.only(top: 20.0)),
 
-                    new Row(
+                    new Text(
+                      "Vessel",
+                      style: new TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18.0
+                        ),
+                    ),
+
+                    new Padding(padding: const EdgeInsets.only(top: 8.0)),
+
+                    new Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: _vessel.keys.map((String key) {
+                        return new CheckboxListTile(
+                          title: new Text(key),
+                          value: _vessel[key],
+                          onChanged: (bool value) {
+                            setState(() {
+                              _vessel[key] = value;
+                            });
+                          },
+                        );
+                      }).toList(),
+                    ),
+
+                    new Padding(padding: const EdgeInsets.only(top: 20.0)),
+
+                    _isLoading ? new CircularProgressIndicator() : new Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: <Widget>[
                   
