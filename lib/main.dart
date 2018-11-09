@@ -53,9 +53,9 @@ class _MyHomePageState extends State<MyHomePage> {
   String _email;
   String _valueDOB = 'No Date Selected!';
   String _valueDOA = 'No Date Selected!';
-  String _occupation;
-  String _place_of_work;
-  String _inviter_name;
+  String _occupation = "";
+  String _place_of_work = "";
+  String _inviter_name = "";
 
   // variable for membership
   String _member = "Yes";
@@ -64,16 +64,16 @@ class _MyHomePageState extends State<MyHomePage> {
   String _student = "Yes";
 
   // variables for student info
-  String _school;
-  String _programme;
-  String _hall_hostel;
-  String _room_number;
-  String _area;
+  String _school = "";
+  String _programme = "";
+  String _hall_hostel = "";
+  String _room_number = "";
+  String _area = "";
 
   // varibles for non_student info
-  String _residence;
-  String _house_num;
-  String _landmark;
+  String _residence = "";
+  String _house_num = "";
+  String _landmark = "";
 
   int year = DateTime.now().year + 1;
 
@@ -175,6 +175,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void _performPost(){
     Dio dio = new Dio();
+    print(_vessel['Choir'].toString());
 
     var body = {
       "name" : _name,
@@ -195,18 +196,20 @@ class _MyHomePageState extends State<MyHomePage> {
       "residence" : _residence,
       "house_no" : _house_num,
       "landmark" : _landmark,
-      "choir" : _vessel['choir'].toString(),
-      "ushering" : _vessel['ushering'].toString(),
-      "technical" : _vessel['technical'].toString(),
-      "mpv" : _vessel['mpv'].toString(),
-      "library" : _vessel['library'].toString(),
-      "venue_decorators" : _vessel['venue_decorators'].toString()
+      "choir" : _vessel['Choir'].toString(),
+      "ushering" : _vessel['Ushering'].toString(),
+      "technical" : _vessel['Technical'].toString(),
+      "mpv" : _vessel['MPV'].toString(),
+      "library" : _vessel['Library'].toString(),
+      "venue_decorators" : _vessel['Venue Decorators'].toString()
     };
+
+    print(body);
 
     FormData formData = new FormData.from(body);
 
     dio.post(
-      "https://ccndirectory.herokuapp.com/first_timers/",
+      "http://192.168.8.100:5000/first_timers/",
       data: formData,
       options: Options(
         method: 'POST',
