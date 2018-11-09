@@ -209,7 +209,7 @@ class _MyHomePageState extends State<MyHomePage> {
     FormData formData = new FormData.from(body);
 
     dio.post(
-      "http://192.168.8.100:5000/first_timers/",
+      "https://ccndirectory.herokuapp.com/first_timers/",
       data: formData,
       options: Options(
         method: 'POST',
