@@ -170,12 +170,22 @@ class _MyHomePageState extends State<MyHomePage> {
   void _reset(){
     final formState = formKey.currentState;
 
+    setState(() {
+          _valueDOB = 'No Date Selected!';
+          _valueDOA = 'No Date Selected!';
+          _vessel['Choir'] = false;
+          _vessel['Ushering'] = false;
+          _vessel['Technical'] = false;
+          _vessel['MPV'] = false;
+          _vessel['Library'] = false;
+          _vessel['Venue Decorators'] = false;
+        });
+
     formState.reset();
   }
 
   void _performPost(){
     Dio dio = new Dio();
-    print(_vessel['Choir'].toString());
 
     var body = {
       "name" : _name,
@@ -204,7 +214,7 @@ class _MyHomePageState extends State<MyHomePage> {
       "venue_decorators" : _vessel['Venue Decorators'].toString()
     };
 
-    print(body);
+    // print(body);
 
     FormData formData = new FormData.from(body);
 
@@ -213,11 +223,12 @@ class _MyHomePageState extends State<MyHomePage> {
       data: formData,
       options: Options(
         method: 'POST',
-        responseType: ResponseType.JSON
+        responseType: ResponseType.JSON,
+        connectTimeout: 10000
       )
       )
       .then((response) {
-        print(response.data);
+        // print(response.data);
         // print(responseMap);
         _showDialog(response.data);
         setState(() => _isLoading = false);
@@ -240,6 +251,7 @@ class _MyHomePageState extends State<MyHomePage> {
             new FlatButton(
               child: new Text("OK"),
               onPressed: () {
+                _reset();
                 Navigator.of(context).pop();
               },
             ),
@@ -271,7 +283,6 @@ class _MyHomePageState extends State<MyHomePage> {
                   children: <Widget>[
                     // full name entry
                     new TextFormField(
-                      initialValue: _name,
                       decoration: new InputDecoration(
                           hintText: "Full Name",
                           labelText: "Full Name",
