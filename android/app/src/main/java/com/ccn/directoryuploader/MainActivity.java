@@ -1,4 +1,4 @@
-package com.example.directoryuploader;
+package com.ccn.directoryuploader;
 
 import android.os.Bundle;
 import android.view.ViewTreeObserver;
@@ -12,7 +12,7 @@ public class MainActivity extends FlutterActivity {
     super.onCreate(savedInstanceState);
 
     //make transparent status bar
-    getWindow().setStatusBarColor(0x00000000);
+    // getWindow().setStatusBarColor(0x00000000);
 
     GeneratedPluginRegistrant.registerWith(this);
 
